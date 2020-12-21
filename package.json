@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/likr/zenn#readme",
   "devDependencies": {
-    "prettier": "^2.1.2",
-    "zenn-cli": "^0.1.53"
+    "prettier": "^2.2.1",
+    "zenn-cli": "^0.1.63"
   }
 }
