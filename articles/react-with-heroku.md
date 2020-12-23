@@ -481,7 +481,7 @@ API サーバーとフロントエンドが連携することで実際の Web �
 ここからは、ローカルの開発環境からアクセスできる PostgreSQL のサーバーを用意しておく必要があります。データベースのホストを `localhost` 、ポート番号を `5432` 、ユーザー名を `postgres` 、パスワードを `postgres` 、データベース名を `review_app` として説明をします。異なる設定にしている場合はプログラムを適宜読み替えてください。データベースサーバーは好きな方法で用意してもらって構いませんが、例えば Docker であれば以下のコマンドで PostgreSQL のサーバーを起動することが可能です。
 
 ```shell-session
-$ docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=review_app -p 5432:5432 postgres
+$ docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=review_app -p 5432:5432 postgres:12
 ```
 
 関係データベースでは一般的にクエリ言語の SQL を通じて操作を行います。基本的には API サーバーのプログラムが SQL を組み立てて、それをデータベースサーバーとやり取りすることになります。SQL で取り出した情報は JavaScript 等のプログラミング言語で扱いやすい状態になっていると便利でしょう。O/R マッパーは、SQL の組み立てやクエリ結果のオブジェクトへの変換を行うライブラリで、Node.js では Sequelize という有名な O/R マッパーがあります。
@@ -931,7 +931,7 @@ Auth0 での管理単位はテナントと呼ばれます。Auth0 に登録す�
 $ npm i node-fetch express-jwt jwks-rsa
 ```
 
-`server/auth0.js` を作成して、認証処理とユーザー情報取得処理を実装します。このあたりは Auth0 のドキュメントに載っている実装例なので、細かい中身までは理解できなくても問題ないでしょう。
+`server/auth0.js` を作成して、認証処理とユーザー情報取得処理を実装します。このあたりは Auth0 のドキュメントに載っている実装例なので、細かい中身までは理解できなくても問題ないでしょう。 **12 行目の `audience` を自分の API サーバーのオリジンに設定するのを忘れないでください。**
 
 ```javascript:server/auth0.js
 import fetch from "node-fetch";
