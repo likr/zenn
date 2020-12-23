@@ -3,7 +3,7 @@ title: "Reactチュートリアル2：レビューサイトを作ろう"
 emoji: "🍜"
 type: "tech"
 topics: ["javascript", "react", "nodejs", "heroku"]
-published: false
+published: true
 ---
 
 # 本資料について
