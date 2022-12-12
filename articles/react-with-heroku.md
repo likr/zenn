@@ -361,9 +361,9 @@ export function App() {
 
 このアプリは 3 つの画面が存在するため、それぞれに URL を決めて 3 つのルートを設定しています。`/` はトップ画面、`/restaurants` はラーメン店一覧画面、`/restaurants/:restaurantId` はラーメン店詳細画面にそれぞれ対応しています。それぞれのルートに対応する具体的な表示内容は `Route` コンポーネントの子要素に持たせます。ここでは、URL が `/` のとき `RootPage` コンポーネント、`/restaurants` のとき `RestaurantListPage` コンポーネント、`/restaurants/:restaurantId` のとき `RestaurantDetailPage` コンポーネントがレンダリングされます。なお、Express と同様に `:restaurantId` はプレースホルダーになっていて、具体的な ID と置き換えられます。
 
-次に `client/pages/Root.jsx` を以下の内容で作成します。
+次に `client/src/pages/Root.jsx` を以下の内容で作成します。
 
-```jsx:client/pages/Root.jsx
+```jsx:client/src/pages/Root.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRestaurants } from "../api.js";
@@ -442,13 +442,13 @@ export async function getRestaurantReviews(restaurantId, arg = {}) {
 
 `/restaurants` と `/restaurants/:restaurantId` 、 `/restaurants/:restaurantId/reviews` に対して GET リクエストを行う関数をそれぞれ `getRestaurants` 、 `getRestaurant` 、`getRestaurantReviews` としています。これらの間の共通の処理は `request` 関数にまとめています。
 
-ここまででフロントエンドを動作させる一通りのプログラムを書き終えたはずなので、 `client` ディレクトリ内で `npm start` を実行することでフロントエンドの開発サーバーを起動し、http://localhost:3000 にアクセスしてみましょう。ラーメン店の情報が表示されて欲しいところですが、いつまで待っても「loading...」の表示が消えません。開発者ツールのコンソールを確認すると以下のようなエラーが見られるでしょう。
+ここまででフロントエンドを動作させる一通りのプログラムを書き終えたはずなので、 `client` ディレクトリ内で `npm start` を実行することでフロントエンドの開発サーバーを起動し、http://localhost:5173 にアクセスしてみましょう。ラーメン店の情報が表示されて欲しいところですが、いつまで待っても「loading...」の表示が消えません。開発者ツールのコンソールを確認すると以下のようなエラーが見られるでしょう。
 
 ```
-Access to fetch at 'http://localhost:5000/restaurants?limit=3' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+Access to fetch at 'http://localhost:5000/restaurants?limit=3' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
 ```
 
-現在の Web では、セキュリティ上の理由で異なるオリジンへの API リクエストは制限されています。フロントエンドのオリジンが http://localhost:3000 であるのに対して API サーバーのオリジンが http://localhost:5000 と異なるため、この制限に引っかかっているということです。これを解消するためには API サーバー側でどのオリジンからのアクセスを許可するという設定をしなければいけません。どこのオリジンからアクセスされても良いような API サーバーであったとしても、「どこのオリジンからもアクセスされても良い」ということを明示的に設定しておく必要があります。
+現在の Web では、セキュリティ上の理由で異なるオリジンへの API リクエストは制限されています。フロントエンドのオリジンが http://localhost:5173 であるのに対して API サーバーのオリジンが http://localhost:5000 と異なるため、この制限に引っかかっているということです。これを解消するためには API サーバー側でどのオリジンからのアクセスを許可するという設定をしなければいけません。どこのオリジンからアクセスされても良いような API サーバーであったとしても、「どこのオリジンからもアクセスされても良い」ということを明示的に設定しておく必要があります。
 
 フロントエンドと異なるオリジンとの通信は **CORS（Cross-Origin Resource Sharing）** と呼ばれます。改めてサーバー側プログラムに戻って CORS の設定を追加しましょう。
 
@@ -469,7 +469,7 @@ $ npm i cors
 +app.use(cors());
 ```
 
-API サーバーを再起動した後にもう一度 http://localhost:3000 にアクセスしてみましょう。こんどは API サーバーからのレスポンスを受け取って正しくページの表示ができているはずです。ラーメン店の名前や「全てのラーメン店を見る」のボタンを押してページの遷移がうまくいくかも確認してみましょう。
+API サーバーを再起動した後にもう一度 http://localhost:5173 にアクセスしてみましょう。こんどは API サーバーからのレスポンスを受け取って正しくページの表示ができているはずです。ラーメン店の名前や「全てのラーメン店を見る」のボタンを押してページの遷移がうまくいくかも確認してみましょう。
 
 # OR マッパーによるデータベースの利用
 
@@ -785,7 +785,7 @@ $ node migration.js
 
 `findAndCountAll` の戻り値の形式は仮データを使っていた時の形式と同じです（というよりは、仮データを使ったプログラムは Sequelize に合わせるように作りました）。そのため、`rows` には取得したレコードが、`count`には総件数が含まれています。
 
-ここまでプログラムを修正したらサーバーを再起動して http://localhost:3000 からアプリにアクセスしてみましょう。表示される内容は変わらないはずですが、正しく表示されていたら成功です。
+ここまでプログラムを修正したらサーバーを再起動して http://localhost:5173 からアプリにアクセスしてみましょう。表示される内容は変わらないはずですが、正しく表示されていたら成功です。
 
 # Heroku による API サーバーの公開
 
@@ -910,7 +910,7 @@ Auth0 での管理単位はテナントと呼ばれます。Auth0 に登録す�
 
 ![](https://storage.googleapis.com/zenn-user-upload/91n00ogeseb15pugtu6gevwweqbt)
 
-また、それぞれのアプリケーションで「Allowd Callback URLs」と「Allowed Logout URLs」、「Allowed Web Origins」、「Allowed Origins（CORS）」に開発環境と本番環境のフロントエンドの URL を入力し、画面下部の「SAVE CHANGES」ボタンを押して保存します。開発環境の URL は http://localhost:3000 、本番環境の URL は https://reverent-blackwell-e8f8e3.netlify.app/ のような Netlify にデプロイした結果の URL となります。
+また、それぞれのアプリケーションで「Allowd Callback URLs」と「Allowed Logout URLs」、「Allowed Web Origins」、「Allowed Origins（CORS）」に開発環境と本番環境のフロントエンドの URL を入力し、画面下部の「SAVE CHANGES」ボタンを押して保存します。開発環境の URL は http://localhost:5173 、本番環境の URL は https://reverent-blackwell-e8f8e3.netlify.app/ のような Netlify にデプロイした結果の URL となります。
 
 ![](https://storage.googleapis.com/zenn-user-upload/92zxvte7p45qson55e9470qqz32z)
 
@@ -1471,7 +1471,7 @@ React のコンポーネントの中で `useAuth0` を呼び出すことで、�
 +}
 ```
 
-ここまでで認証機能を実装することができました。http://localhost:3000 にアクセスしてログインとレビュー投稿機能が動作するか確認してみましょう。
+ここまでで認証機能を実装することができました。http://localhost:5173 にアクセスしてログインとレビュー投稿機能が動作するか確認してみましょう。
 
 最後にデータベースをクリアして本番環境の更新を行いましょう。データベースの初期化プログラムは、仮データからユーザーとレビューを追加していました。以下のように `server/migration.js` を修正して、ユーザーとレビューの仮データ追加処理を取り除きましょう。
 
