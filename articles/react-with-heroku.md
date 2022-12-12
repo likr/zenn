@@ -106,7 +106,7 @@ API サーバーをはじめからデータベースや認証を使って完全�
    "description": "",
    "main": "index.js",
 +  "engines": {
-+    "node": "14.x"
++    "node": "18.x"
 +  },
 +  "type": "module",
    "scripts": {
@@ -119,7 +119,7 @@ API サーバーをはじめからデータベースや認証を使って完全�
  }
 ```
 
-`"type": "module"` は Node.js で ES Modules 形式のインポート/エクスポートを行うために必要です。`engines` は後に Heroku で API サーバーを公開する際に動作させる Node.js のバージョンを指定します。できるだけローカルでの実行バージョンと、最終的に公開するプロダクション環境での実行バージョンは一致させておいたほうがよいでしょう。本チュートリアルでは、Node.js のバージョン 14 を前提に説明を行います。
+`"type": "module"` は Node.js で ES Modules 形式のインポート/エクスポートを行うために必要です。`engines` は後に Heroku で API サーバーを公開する際に動作させる Node.js のバージョンを指定します。できるだけローカルでの実行バージョンと、最終的に公開するプロダクション環境での実行バージョンは一致させておいたほうがよいでしょう。本チュートリアルでは、Node.js のバージョン 18 を前提に説明を行います。
 
 次に以下のコマンドを実行して Express をインストールします。
 
@@ -162,7 +162,7 @@ app.get("/restaurants", async (req, res) => {
 app.get("/restaurants/:restaurantId", async (req, res) => {
   const restaurantId = +req.params.restaurantId;
   const restaurant = data.restaurants.find(
-    (restaurant) => restaurant.id === restaurantId
+    (restaurant) => restaurant.id === restaurantId,
   );
   if (!restaurant) {
     res.status(404).send("not found");
@@ -184,14 +184,14 @@ app.get("/restaurants/:restaurantId/reviews", async (req, res) => {
   const limit = +req.query.limit || 5;
   const offset = +req.query.offset || 0;
   const restaurant = data.restaurants.find(
-    (restaurant) => restaurant.id === restaurantId
+    (restaurant) => restaurant.id === restaurantId,
   );
   if (!restaurant) {
     res.status(404).send("not found");
     return;
   }
   const reviews = data.reviews.filter(
-    (review) => review.restaurantId === restaurantId
+    (review) => review.restaurantId === restaurantId,
   );
   res.json({
     count: reviews.length,
@@ -288,18 +288,18 @@ API サーバーが仮データを正しく返してくれることが確認で�
 
 ```shell-session
 $ npm i react react-dom react-router-dom bulma
-$ npm i -D react-scripts
+$ npm i -D vite @vitejs/plugin-react
 ```
 
 React Router を利用するために `react-router-dom` をインストールしています。
 
-`client/src/App.js` を以下の内容で作成しましょう。
+`client/src/App.jsx` を以下の内容で作成しましょう。
 
-```jsx:client/src/App.js
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { RootPage } from "./pages/Root.js";
-import { RestaurantDetailPage } from "./pages/RestaurantDetail.js";
-import { RestaurantListPage } from "./pages/RestaurantList.js";
+```jsx:client/src/App.jsx
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { RootPage } from "./pages/Root.jsx";
+import { RestaurantDetailPage } from "./pages/RestaurantDetail.jsx";
+import { RestaurantListPage } from "./pages/RestaurantList.jsx";
 
 function Header() {
   return (
@@ -332,7 +332,7 @@ function Footer() {
 
 export function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Header />
       <section className="section has-background-warning-light">
         <div className="container">
@@ -342,31 +342,28 @@ export function App() {
             </button>
           </div>
           <Switch>
-            <Route path="/" exact>
-              <RootPage />
-            </Route>
-            <Route path="/restaurants" exact>
-              <RestaurantListPage />
-            </Route>
-            <Route path="/restaurants/:restaurantId">
-              <RestaurantDetailPage />
-            </Route>
+            <Route path="/" element={<RootPage />} />
+            <Route path="/restaurants" element={<RestaurantListPage />} />
+            <Route
+              path="/restaurants/:restaurantId"
+              element={<RestaurantDetailPage />}
+            />
           </Switch>
         </div>
       </section>
       <Footer />
-    </Router>
+    </BrowserRouter>
   );
 }
 ```
 
-`App` コンポーネントに注目してください。React Router を使って、ブラウザが表示している URL に応じて React で表示させるコンポーネントを切り替えるように設定しています。ここでは、`react-router-dom` からインポートした `Router` と `Switch` 、 `Router` という 3 つのコンポーネントが登場します。`Router` コンポーネントは、React Router が管理するコンポーネントの範囲を設定します。基本的にはアプリケーションのコンポーネント全体を `Router` コンポーネントの子要素にしておくとよいでしょう。`Switch` コンポーネントは、URL によって切り替わる要素の場所を設定します。`Route` コンポーネントは、`path` 属性を持ち、URL が `path` と一致したときにページに表示させる内容を設定します。
+`App` コンポーネントに注目してください。React Router を使って、ブラウザが表示している URL に応じて React で表示させるコンポーネントを切り替えるように設定しています。ここでは、`react-router-dom` からインポートした `BrowserRouter` と `Route` 、 `Routes` という 3 つのコンポーネントが登場します。`BrowserRouter` コンポーネントは、React Router が管理するコンポーネントの範囲を設定します。基本的にはアプリケーションのコンポーネント全体を `BrowserRouter` コンポーネントの子要素にしておくとよいでしょう。`Routes` コンポーネントは、URL によって切り替わる要素の場所を設定します。`Route` コンポーネントは、`path` 属性を持ち、URL が `path` と一致したときにページに表示させる内容を `element` props で設定します。
 
 このアプリは 3 つの画面が存在するため、それぞれに URL を決めて 3 つのルートを設定しています。`/` はトップ画面、`/restaurants` はラーメン店一覧画面、`/restaurants/:restaurantId` はラーメン店詳細画面にそれぞれ対応しています。それぞれのルートに対応する具体的な表示内容は `Route` コンポーネントの子要素に持たせます。ここでは、URL が `/` のとき `RootPage` コンポーネント、`/restaurants` のとき `RestaurantListPage` コンポーネント、`/restaurants/:restaurantId` のとき `RestaurantDetailPage` コンポーネントがレンダリングされます。なお、Express と同様に `:restaurantId` はプレースホルダーになっていて、具体的な ID と置き換えられます。
 
-次に `client/pages/Root.js` を以下の内容で作成します。
+次に `client/pages/Root.jsx` を以下の内容で作成します。
 
-```jsx:client/pages/Root.js
+```jsx:client/pages/Root.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRestaurants } from "../api.js";
@@ -411,19 +408,19 @@ export function RootPage() {
 
 ここまでで全てのコンポーネントの実装が終わりました。最後に API サーバーへのリクエストを行う関数を実装していきましょう。
 
-開発環境では、現在 http://localhost:5000 で動いている開発用の API サーバーにアクセスしていますが、最終的には Heroku 上で公開をするため、API サーバーの URL を切り替える必要が出てきます。このように、開発環境と本番環境（最終的に公開する環境）でパラメータを切り替える必要がある場合には環境変数を利用すると良いでしょう。`react-scripts` を使っていれば、開発環境用の環境変数を `.env.development` 、本番環境用の環境変数を `.env.production` で設定することができます。これらのファイルには `REACT_APP_` から始まる環境変数名を記述します。
+開発環境では、現在 http://localhost:5000 で動いている開発用の API サーバーにアクセスしていますが、最終的には Heroku 上で公開をするため、API サーバーの URL を切り替える必要が出てきます。このように、開発環境と本番環境（最終的に公開する環境）でパラメータを切り替える必要がある場合には環境変数を利用すると良いでしょう。`vite` を使っていれば、開発環境用の環境変数を `.env.development` 、本番環境用の環境変数を `.env.production` で設定することができます。これらのファイルには `VITE_` から始まる環境変数名を記述します。
 
-API サーバーの URL、正確にはプロトコルとホスト名、ポート番号の 3 つがセットになった **オリジン** を `REACT_APP_API_ORIGIN` という名前で設定しておきます。`client/.env.development` を以下の内容で作成しましょう。
+API サーバーの URL、正確にはプロトコルとホスト名、ポート番号の 3 つがセットになった **オリジン** を `VITE_API_ORIGIN` という名前で設定しておきます。`client/.env.development` を以下の内容で作成しましょう。
 
 ```sh:client/.env.development
-REACT_APP_API_ORIGIN=http://localhost:5000
+VITE_API_ORIGIN=http://localhost:5000
 ```
 
 フロントエンドからの API リクエストには `fetch` を使うことができましたが、API サーバーのエンドポイントに対応した関数を作っておくとコンポーネントの実装が楽になるでしょう。`client/src/api.js` を以下のように実装します。
 
 ```javascript:client/src/api.js
 async function request(path, options = {}) {
-  const url = `${process.env.REACT_APP_API_ORIGIN}${path}`;
+  const url = `${import.meta.env.VITE_API_ORIGIN}${path}`;
   const response = await fetch(url, options);
   return response.json();
 }
@@ -524,7 +521,7 @@ export const User = sequelize.define(
       allowNull: false,
     },
   },
-  { underscored: true }
+  { underscored: true },
 );
 ```
 
@@ -547,7 +544,7 @@ export const Restaurant = sequelize.define(
       type: DataTypes.TEXT,
     },
   },
-  { underscored: true }
+  { underscored: true },
 );
 
 export const Review = sequelize.define(
@@ -576,7 +573,7 @@ export const Review = sequelize.define(
       allowNull: false,
     },
   },
-  { underscored: true }
+  { underscored: true },
 );
 ```
 
@@ -853,7 +850,7 @@ $ heroku pg:push postgres://postgres:postgres@localhost:5432/review_app DATABASE
 API サーバーを公開したことで、本番環境での API サーバーの URL が決まりました。`client/.env.production` を作成して、API サーバーの URL を記載しましょう。Heroku で公開した API サーバーにはランダムなホスト名が割り振られます。本資料では https://desolate-lowlands-46852.herokuapp.com を使用しますが、自分の API の URL を使用してください。
 
 ```sh:client/.env.production
-REACT_APP_API_ORIGIN=https://desolate-lowlands-46852.herokuapp.com
+VITE_API_ORIGIN=https://desolate-lowlands-46852.herokuapp.com
 ```
 
 次に、本番環境で React Router を動作させるための設定を加えます。ラーメン店一覧画面のパスは `/restaurants` となっていますが、何も設定していなければ Netlify の Web サーバー上には `/restaurants` という URL のリソースはなく、URL 欄に直接入力した場合や、ブラウザのリロードでページを更新したときに 404 のページが表示されます。これを避けるために、404 のページを表示する変わりに `index.html` を表示させるような設定が必要です。
@@ -1083,48 +1080,47 @@ $ npm i @auth0/auth0-react
 `.env.development` と `.env.production` に Auth0 のテナントやアプリケーション、API の情報を加えます。資料の内容は例なので、自分で作成した情報を記入してください。
 
 ```diff:client/.env.development
- REACT_APP_API_ORIGIN=http://localhost:5000
-+REACT_APP_AUTH0_DOMAIN=dev-ajrt-kp3.us.auth0.com
-+REACT_APP_AUTH0_CLIENT_ID=th264hq23cFigTYKb1r1ubAAPNvNJ4Fm
-+REACT_APP_AUTH0_AUDIENCE=https://desolate-lowlands-46852.herokuapp.com
+ VITE_API_ORIGIN=http://localhost:5000
++VITE_AUTH0_DOMAIN=dev-ajrt-kp3.us.auth0.com
++VITE_AUTH0_CLIENT_ID=th264hq23cFigTYKb1r1ubAAPNvNJ4Fm
++VITE_AUTH0_AUDIENCE=https://desolate-lowlands-46852.herokuapp.com
 ```
 
 ```diff:client/.env.production
- REACT_APP_API_ORIGIN=https://desolate-lowlands-46852.herokuapp.com
-+REACT_APP_AUTH0_DOMAIN=dev-ajrt-kp3.us.auth0.com
-+REACT_APP_AUTH0_CLIENT_ID=cGIzqEomOg4TLqiH6VfLWolA6gwSVzWN
-+REACT_APP_AUTH0_AUDIENCE=https://desolate-lowlands-46852.herokuapp.com
+ VITE_API_ORIGIN=https://desolate-lowlands-46852.herokuapp.com
++VITE_AUTH0_DOMAIN=dev-ajrt-kp3.us.auth0.com
++VITE_AUTH0_CLIENT_ID=cGIzqEomOg4TLqiH6VfLWolA6gwSVzWN
++VITE_AUTH0_AUDIENCE=https://desolate-lowlands-46852.herokuapp.com
 ```
 
-以下のように `client/src/index.js` を編集して認証機能を加えます。
+以下のように `client/src/main.jsx` を編集して認証機能を加えます。
 
-```diff:client/src/index.js
+```diff:client/src/main.jsx
  import "bulma/css/bulma.css";
- import { render } from "react-dom";
+ import { createRoot } from "react-dom/client";
 +import { Auth0Provider } from "@auth0/auth0-react";
- import { App } from "./App.js";
+ import { App } from "./App.jsx";
 
--render(<App />, document.querySelector("#content"));
-+render(
+-createRoot(document.querySelector("#content")).render(<App />);
++createRoot(document.querySelector("#content")).render(
 +  <Auth0Provider
-+    domain={process.env.REACT_APP_AUTH0_DOMAIN}
-+    clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
++    domain={import.meta.env.VITE_AUTH0_DOMAIN}
++    clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
 +    redirectUri={window.location.origin}
 +  >
 +    <App />
 +  </Auth0Provider>,
-+  document.querySelector("#content")
 +);
 ```
 
-`client/src/App.js` を編集して、ログインボタンが動作するようにします。すでにログイン中の場合はログアウトができるようにログアウトボタンに切り替えます。
+`client/src/App.jsx` を編集して、ログインボタンが動作するようにします。すでにログイン中の場合はログアウトができるようにログアウトボタンに切り替えます。
 
-```diff:client/src/App.js
- import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+```diff:client/src/App.jsx
+ import { BrowserRouter, Route, Routes } from "react-router-dom";
 +import { useAuth0 } from "@auth0/auth0-react";
- import { RootPage } from "./pages/Root.js";
- import { RestaurantDetailPage } from "./pages/RestaurantDetail.js";
- import { RestaurantListPage } from "./pages/RestaurantList.js";
+ import { RootPage } from "./pages/Root.jsx";
+ import { RestaurantDetailPage } from "./pages/RestaurantDetail.jsx";
+ import { RestaurantListPage } from "./pages/RestaurantList.jsx";
 
 +function AuthButton() {
 +  const { isLoading, isAuthenticated, loginWithRedirect, logout } = useAuth0();
@@ -1201,7 +1197,7 @@ $ npm i @auth0/auth0-react
 
  export function App() {
    return (
-     <Router>
+     <BrowserRouter>
        <Header />
        <section className="section has-background-warning-light">
          <div className="container">
@@ -1211,30 +1207,27 @@ $ npm i @auth0/auth0-react
 -            </button>
 +            <AuthButton />
            </div>
-           <Switch>
-             <Route path="/" exact>
-               <RootPage />
-             </Route>
-             <Route path="/restaurants" exact>
-               <RestaurantListPage />
-             </Route>
-             <Route path="/restaurants/:restaurantId">
-               <RestaurantDetailPage />
-             </Route>
-           </Switch>
+           <Routes>
+             <Route path="/" element={<RootPage />} />
+             <Route path="/restaurants" element={<RestaurantListPage />} />
+             <Route
+               path="/restaurants/:restaurantId"
+               element={<RestaurantDetailPage />}
+             />
+           </Routes>
          </div>
        </section>
        <Footer />
-     </Router>
+     </BrowserRouter>
    );
  }
 ```
 
 React のコンポーネントの中で `useAuth0` を呼び出すことで、現在の認証情報やログイン・ログアウトを行う関数を取り出すことができます。
 
-次に `client/src/pages/RestaurantDetails.js` を以下のように編集して、レビューの投稿フォームが機能するようにします。
+次に `client/src/pages/RestaurantDetails.jsx` を以下のように編集して、レビューの投稿フォームが機能するようにします。
 
-```diff:client/src/pages/RestaurantDetail.js
+```diff:client/src/pages/RestaurantDetail.jsx
  import { useEffect, useState } from "react";
  import { useLocation, useParams } from "react-router-dom";
 +import { useAuth0 } from "@auth0/auth0-react";
@@ -1440,7 +1433,7 @@ React のコンポーネントの中で `useAuth0` を呼び出すことで、�
 
 ```diff:client/src/api.js
  async function request(path, options = {}) {
-   const url = `${process.env.REACT_APP_API_ORIGIN}${path}`;
+   const url = `${import.meta.env.VITE_API_ORIGIN}${path}`;
    const response = await fetch(url, options);
    return response.json();
  }
@@ -1465,7 +1458,7 @@ React のコンポーネントの中で `useAuth0` を呼び出すことで、�
 +  getAccessToken
 +) {
 +  const token = await getAccessToken({
-+    audience: process.env.REACT_APP_AUTH0_AUDIENCE,
++    audience: import.meta.env.VITE_AUTH0_AUDIENCE,
 +  });
 +  return request(`/restaurants/${restaurantId}/reviews`, {
 +    body: JSON.stringify(record),
