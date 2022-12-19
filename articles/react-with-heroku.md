@@ -442,7 +442,7 @@ export async function getRestaurantReviews(restaurantId, arg = {}) {
 
 `/restaurants` と `/restaurants/:restaurantId` 、 `/restaurants/:restaurantId/reviews` に対して GET リクエストを行う関数をそれぞれ `getRestaurants` 、 `getRestaurant` 、`getRestaurantReviews` としています。これらの間の共通の処理は `request` 関数にまとめています。
 
-ここまででフロントエンドを動作させる一通りのプログラムを書き終えたはずなので、 `client` ディレクトリ内で `npm start` を実行することでフロントエンドの開発サーバーを起動し、http://localhost:5173 にアクセスしてみましょう。ラーメン店の情報が表示されて欲しいところですが、いつまで待っても「loading...」の表示が消えません。開発者ツールのコンソールを確認すると以下のようなエラーが見られるでしょう。
+ここまででフロントエンドを動作させる一通りのプログラムを書き終えたはずなので、 `client` ディレクトリ内で `npm run dev` を実行することでフロントエンドの開発サーバーを起動し、http://localhost:5173 にアクセスしてみましょう。ラーメン店の情報が表示されて欲しいところですが、いつまで待っても「loading...」の表示が消えません。開発者ツールのコンソールを確認すると以下のようなエラーが見られるでしょう。
 
 ```
 Access to fetch at 'http://localhost:5000/restaurants?limit=3' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
