@@ -341,14 +341,14 @@ export function App() {
               ログイン
             </button>
           </div>
-          <Switch>
+          <Routes>
             <Route path="/" element={<RootPage />} />
             <Route path="/restaurants" element={<RestaurantListPage />} />
             <Route
               path="/restaurants/:restaurantId"
               element={<RestaurantDetailPage />}
             />
-          </Switch>
+          </Routes>
         </div>
       </section>
       <Footer />
